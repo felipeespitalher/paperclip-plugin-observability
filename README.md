@@ -4,7 +4,8 @@ Sidebar module for viewing **Grafana** and **AWS CloudWatch** metrics inside [Pa
 
 ## Features (v0.1)
 
-- **Observability** entry in the company sidebar (`/:company/observability`)
+- **Observability** sidebar nav slot (`observability-nav`) linking to the plugin page
+- Full page at `/:company/plugins/paperclip.observability/observability`
 - Per-company provider configuration (Grafana URL or CloudWatch region)
 - Worker health and overview data via the Paperclip plugin bridge
 
@@ -43,4 +44,4 @@ MIT — see [LICENSE](./LICENSE).
 
 ## Repository
 
-Publish this folder as a public GitHub repository (for example `paperclipai/paperclip-plugin-observability`) and install from npm once released.
+Public source: [github.com/felipeespitalher/paperclip-plugin-observability](https://github.com/felipeespitalher/paperclip-plugin-observability)
