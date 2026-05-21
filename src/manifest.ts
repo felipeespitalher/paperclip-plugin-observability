@@ -25,7 +25,6 @@ const manifest: PaperclipPluginManifestV1 = {
         type: "sidebar",
         id: "observability-nav",
         displayName: "Observability",
-        routePath: "observability",
         exportName: "ObservabilitySidebar",
         order: 40,
       },
