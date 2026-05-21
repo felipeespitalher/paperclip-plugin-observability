@@ -16,10 +16,10 @@ export function ObservabilitySidebar(_props: PluginSidebarProps) {
   const nav = useHostNavigation();
 
   return (
-    <button
-      type="button"
-      onClick={() => nav.navigate(OBSERVABILITY_ROUTE)}
+    <a
+      {...nav.linkProps(OBSERVABILITY_ROUTE)}
       style={{
+        display: "block",
         width: "100%",
         textAlign: "left",
         background: "transparent",
@@ -27,10 +27,12 @@ export function ObservabilitySidebar(_props: PluginSidebarProps) {
         padding: "0.5rem 0.75rem",
         cursor: "pointer",
         font: "inherit",
+        color: "inherit",
+        textDecoration: "none",
       }}
     >
       Observability
-    </button>
+    </a>
   );
 }
 
