@@ -1,7 +1,5 @@
 import { useState } from "react";
 import {
-  MetricCard,
-  StatusBadge,
   useHostContext,
   useHostNavigation,
   usePluginAction,
@@ -11,21 +9,16 @@ import {
 } from "@paperclipai/plugin-sdk/ui";
 import type { ObservabilityOverview } from "../worker.js";
 
-function observabilityHref(companyPrefix: string | null | undefined, pluginId: string) {
-  return companyPrefix
-    ? `/${companyPrefix}/plugins/${pluginId}/observability`
-    : `/plugins/${pluginId}/observability`;
-}
+/** Company-scoped plugin page route (manifest `routePath: observability`). */
+const OBSERVABILITY_ROUTE = "/observability";
 
-export function ObservabilitySidebar(props: PluginSidebarProps) {
+export function ObservabilitySidebar(_props: PluginSidebarProps) {
   const nav = useHostNavigation();
-  const prefix = props.context.companyPrefix;
-  const href = observabilityHref(prefix, "paperclip.observability");
 
   return (
     <button
       type="button"
-      onClick={() => nav.navigate(href)}
+      onClick={() => nav.navigate(OBSERVABILITY_ROUTE)}
       style={{
         width: "100%",
         textAlign: "left",
@@ -63,7 +56,12 @@ export function ObservabilityPage(_props: PluginPageProps) {
   }
 
   if (loading) {
-    return <div style={{ padding: "1.5rem" }}>Loading observability status…</div>;
+    return (
+      <div style={{ padding: "1.5rem" }}>
+        <h1 style={{ margin: 0 }}>Observability</h1>
+        <p>Loading observability status…</p>
+      </div>
+    );
   }
 
   if (error) {
@@ -75,8 +73,12 @@ export function ObservabilityPage(_props: PluginPageProps) {
     );
   }
 
-  const statusVariant =
-    data?.status === "ok" ? "ok" : data?.status === "not_configured" ? "warning" : "info";
+  const statusLabel =
+    data?.status === "ok"
+      ? "OK"
+      : data?.status === "not_configured"
+        ? "Not configured"
+        : (data?.status ?? "unknown");
 
   async function handleSave() {
     setSaving(true);
@@ -106,14 +108,42 @@ export function ObservabilityPage(_props: PluginPageProps) {
       </header>
 
       <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
-        <StatusBadge status={statusVariant} label={data?.status ?? "unknown"} />
+        <span
+          style={{
+            fontSize: "0.75rem",
+            fontWeight: 600,
+            padding: "0.15rem 0.5rem",
+            borderRadius: 4,
+            border: "1px solid rgba(128,128,128,0.35)",
+          }}
+        >
+          {statusLabel}
+        </span>
         <span>{data?.message}</span>
         <span style={{ opacity: 0.6, fontSize: "0.85rem" }}>Checked {data?.checkedAt}</span>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "0.75rem" }}>
-        <MetricCard label="Provider" value={data?.provider ?? "none"} />
-        <MetricCard label="Company" value={companyId.slice(0, 8) + "…"} />
+        <div
+          style={{
+            border: "1px solid rgba(128,128,128,0.25)",
+            borderRadius: 8,
+            padding: "0.75rem",
+          }}
+        >
+          <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>Provider</div>
+          <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{data?.provider ?? "none"}</div>
+        </div>
+        <div
+          style={{
+            border: "1px solid rgba(128,128,128,0.25)",
+            borderRadius: 8,
+            padding: "0.75rem",
+          }}
+        >
+          <div style={{ fontSize: "0.75rem", opacity: 0.7 }}>Company</div>
+          <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{companyId.slice(0, 8)}…</div>
+        </div>
       </div>
 
       <section
