@@ -1,15 +1,28 @@
 {
-  "name": "@paperclip/observability",
-  "version": "0.1.0",
+  "name": "@gaud_erp/papperclip_observability",
+  "version": "0.3.3",
   "type": "module",
-  "private": true,
   "description": "Grafana and CloudWatch metrics in the Paperclip sidebar",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gauderp/paperclip-plugin-observability.git"
+  },
+  "homepage": "https://github.com/gauderp/paperclip-plugin-observability#readme",
+  "bugs": {
+    "url": "https://github.com/gauderp/paperclip-plugin-observability/issues"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
     "build": "node ./esbuild.config.mjs",
     "build:rollup": "rollup -c",
     "dev": "node ./esbuild.config.mjs --watch",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build",
     "test": "vitest run --config ./vitest.config.ts",
     "typecheck": "tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "paperclipPlugin": {
     "manifest": "./dist/manifest.js",
@@ -19,6 +32,9 @@
   "keywords": ["paperclip", "plugin", "observability", "grafana", "cloudwatch"],
   "author": "Paperclip",
   "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.1052.0"
+  },
   "devDependencies": {
     "@paperclipai/plugin-sdk": "2026.517.0",
     "@rollup/plugin-node-resolve": "^16.0.1",

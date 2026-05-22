@@ -3,16 +3,19 @@ import type { PaperclipPluginManifestV1 } from "@paperclipai/plugin-sdk";
 const manifest: PaperclipPluginManifestV1 = {
   id: "paperclip.observability",
   apiVersion: 1,
-  version: "0.1.0",
+  version: "0.3.3",
   displayName: "Observability",
-  description: "View Grafana and CloudWatch metrics inside Paperclip",
+  description:
+    "Configure metrics data sources and view imported dashboards (Grafana, AWS CloudWatch)",
   author: "Paperclip",
   categories: ["ui"],
   capabilities: [
     "plugin.state.read",
     "plugin.state.write",
+    "secrets.read-ref",
     "ui.sidebar.register",
     "ui.page.register",
+    "instance.settings.register",
     "metrics.write",
   ],
   entrypoints: {
@@ -29,11 +32,26 @@ const manifest: PaperclipPluginManifestV1 = {
         order: 40,
       },
       {
+        type: "routeSidebar",
+        id: "observability-route-nav",
+        displayName: "Observability",
+        routePath: "observability",
+        exportName: "ObservabilityRouteSidebar",
+        order: 40,
+      },
+      {
         type: "page",
         id: "observability",
         displayName: "Observability",
         routePath: "observability",
         exportName: "ObservabilityPage",
+        order: 40,
+      },
+      {
+        type: "settingsPage",
+        id: "observability-settings",
+        displayName: "Observability",
+        exportName: "ObservabilitySettingsPage",
         order: 40,
       },
     ],

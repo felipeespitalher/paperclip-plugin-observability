@@ -7,9 +7,9 @@ Bring **Grafana dashboards** and **AWS CloudWatch** into [Paperclip](https://git
 | | |
 |---|---|
 | **What it does** | Adds an **Observability** sidebar entry and a full-page view at `/:company/observability` |
-| **Providers** | Grafana (embedded iframe) · CloudWatch (deep link to AWS console) |
+| **Providers** | Grafana (embedded iframe) · CloudWatch (in-app charts + console link) |
 | **Scope** | Per-company configuration stored in plugin state |
-| **Version** | 0.1.0 — sidebar, config UI, embed/link panel |
+| **Version** | 0.3.3 — embedded dashboards + documented host telemetry contract |
 
 ## Overview
 
@@ -18,7 +18,7 @@ Paperclip runs agent workflows, issues, and company workspaces. When something m
 1. Install the plugin on your Paperclip instance.
 2. Open **Observability** in the sidebar for a company.
 3. Choose Grafana or CloudWatch and save URLs/regions.
-4. View metrics on the same page — Grafana loads in an iframe; CloudWatch opens via a secure external link (AWS blocks reliable iframe embed).
+4. View metrics on the same page — Grafana loads in an iframe; CloudWatch renders imported series as in-app charts (console link as fallback).
 
 ![UI overview — sidebar nav, provider config, and Grafana embed panel](./docs/ui-overview.svg)
 
@@ -56,21 +56,35 @@ flowchart LR
 
 ## Features
 
-### Available in v0.1
+### Available in v0.3
 
-- **Sidebar navigation** — `Observability` link in the company sidebar (`observability-nav` slot).
-- **Dedicated page** — `/:company/observability` with status badge, provider summary, and configuration form.
+- **Sidebar navigation** — `Observability` link in the company sidebar (`observability-nav` slot) plus route-local nav on the observability page.
+- **Dashboard + sources tabs** — `/:company/observability` (charts/embed) and `#sources` (configuration).
 - **Grafana** — embeds your Grafana base URL in kiosk/TV mode (`?kiosk=tv`) for a chromeless dashboard view.
-- **CloudWatch** — builds a regional AWS console URL; users open metrics in a new tab (iframe not supported by AWS).
-- **Per-company settings** — each Paperclip company can point at different Grafana instances or AWS regions; plugin **Settings** page (`settingsPage` slot) mirrors the Observability page form.
-- **AWS access (secret refs)** — CloudWatch provider accepts company secret references for access key id and secret key, with **Test AWS access** in the worker.
+- **CloudWatch (embedded)** — imports EB/ECS/RDS metrics via the AWS API and renders in-app charts; console deep link remains as fallback.
+- **Per-company settings** — each Paperclip company can point at different Grafana instances or AWS regions; plugin **Settings** page (`settingsPage` slot) mirrors the Observability form.
+- **AWS access (secret refs)** — CloudWatch provider accepts company secret references (`secrets.read-ref`), with **Test AWS access** in the worker.
+- **Host metrics** — worker emits `observability.cloudwatch.*` via `metrics.write` after each metrics fetch.
 - **Health check** — worker `onHealth` reports plugin availability to the host.
 
 ### Planned
 
-- Embedded CloudWatch widgets where AWS APIs allow
-- Auth and secrets integration (API keys, IAM roles) instead of URL-only config
-- Telemetry contracts for agent-run metrics inside Paperclip
+- Prometheus data source
+- `telemetry.track` for structured plugin events (see TELEMETRY_CONTRACT.md)
+- Grafana API token via company secrets (anonymous/embed auth today)
+
+Host↔plugin contract: [docs/TELEMETRY_CONTRACT.md](./docs/TELEMETRY_CONTRACT.md)
+
+## Releases (npmjs)
+
+Cada versão publicada no npm segue o fluxo em **[docs/RELEASE.md](./docs/RELEASE.md)**:
+
+1. Bump `version` em `package.json` + `src/manifest.ts`
+2. GitHub Release com tag `vX.Y.Z`
+3. CI publica `@gaud_erp/papperclip_observability@X.Y.Z` no registry.npmjs.org
+4. Na instância: `paperclipai plugin install @gaud_erp/papperclip_observability@X.Y.Z`
+
+Secret obrigatório no GitHub: `NPM_TOKEN` (publish no escopo `@gaud_erp`).
 
 ## Requirements
 
@@ -160,7 +174,9 @@ paperclip-plugin-observability/
 
 ### Capabilities declared
 
-`plugin.state.read`, `plugin.state.write`, `ui.sidebar.register`, `ui.page.register`, `metrics.write`
+`plugin.state.read`, `plugin.state.write`, `secrets.read-ref`, `ui.sidebar.register`, `ui.page.register`, `instance.settings.register`, `metrics.write`
+
+See [docs/TELEMETRY_CONTRACT.md](./docs/TELEMETRY_CONTRACT.md) for data keys, actions, and host metrics boundaries.
 
 ## Screenshots
 
