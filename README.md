@@ -109,6 +109,8 @@ paperclipai plugin inspect paperclip.observability --api-base http://127.0.0.1:3
 
 `auth login` prints an approval URL — open it in the browser, approve instance-admin access, then rerun `plugin install`.
 
+**Windows `spawn npm ENOENT`:** If the API returns `npm install failed … spawn npm ENOENT`, the Paperclip **server** cannot run `npm.cmd` without a shell (see [paperclip#2122](https://github.com/paperclipai/paperclip/issues/2122)). Restart the instance after upgrading Paperclip to a build that includes the `shell: win32` fix in `plugin-loader.js`, or patch `@paperclipai/server/dist/services/plugin-loader.js` and restart `paperclipai run`.
+
 ```bash
 # Local dev path (still requires instance admin)
 paperclipai plugin install /absolute/path/to/paperclip-plugin-observability
