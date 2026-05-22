@@ -1,5 +1,7 @@
 # Paperclip Observability Plugin
 
+Source: [gauderp/paperclip-plugin-observability](https://github.com/gauderp/paperclip-plugin-observability) · npm: `@gaud_erp/papperclip_observability@0.1.0`
+
 Bring **Grafana dashboards** and **AWS CloudWatch** into [Paperclip](https://github.com/paperclipai/paperclip) so operators and engineers can check production health without leaving the company workspace.
 
 | | |
@@ -60,7 +62,8 @@ flowchart LR
 - **Dedicated page** — `/:company/observability` with status badge, provider summary, and configuration form.
 - **Grafana** — embeds your Grafana base URL in kiosk/TV mode (`?kiosk=tv`) for a chromeless dashboard view.
 - **CloudWatch** — builds a regional AWS console URL; users open metrics in a new tab (iframe not supported by AWS).
-- **Per-company settings** — each Paperclip company can point at different Grafana instances or AWS regions.
+- **Per-company settings** — each Paperclip company can point at different Grafana instances or AWS regions; plugin **Settings** page (`settingsPage` slot) mirrors the Observability page form.
+- **AWS access (secret refs)** — CloudWatch provider accepts company secret references for access key id and secret key, with **Test AWS access** in the worker.
 - **Health check** — worker `onHealth` reports plugin availability to the host.
 
 ### Planned
@@ -79,7 +82,35 @@ flowchart LR
 
 ### Install on a running Paperclip instance
 
+Requires the Paperclip CLI and **instance-admin** board auth (agent API keys cannot install plugins).
+
+**Windows / CLI not in PATH:** install the CLI once, then open a **new** PowerShell window:
+
+```powershell
+npm install -g paperclipai@2026.517.0
+paperclipai --version
+```
+
+If `paperclipai` is still not recognized, prefix commands with `npx` or use the full path:
+
+```powershell
+npx --yes paperclipai@2026.517.0 auth login --instance-admin --api-base http://127.0.0.1:3100
+npx --yes paperclipai@2026.517.0 plugin install @gaud_erp/papperclip_observability@0.1.0 --api-base http://127.0.0.1:3100
+npx --yes paperclipai@2026.517.0 plugin inspect paperclip.observability --api-base http://127.0.0.1:3100
+```
+
+**Unix / global CLI on PATH:**
+
 ```bash
+paperclipai auth login --instance-admin --api-base http://127.0.0.1:3100
+paperclipai plugin install @gaud_erp/papperclip_observability@0.1.0 --api-base http://127.0.0.1:3100
+paperclipai plugin inspect paperclip.observability --api-base http://127.0.0.1:3100
+```
+
+`auth login` prints an approval URL — open it in the browser, approve instance-admin access, then rerun `plugin install`.
+
+```bash
+# Local dev path (still requires instance admin)
 paperclipai plugin install /absolute/path/to/paperclip-plugin-observability
 ```
 
@@ -88,11 +119,12 @@ Paperclip watches `dist/` for local-path installs and reloads the worker after r
 ### Configure a company
 
 1. Select the company in Paperclip.
-2. Click **Observability** in the sidebar.
+2. Open **Instance Settings → Plugins → Observability** (settings tab), **or** click **Observability** in the company sidebar.
 3. Under **Provider configuration**, choose **Grafana** or **CloudWatch**.
-4. Enter the **Grafana base URL** (e.g. `https://grafana.example.com`) or **AWS region** (e.g. `us-east-1`).
-5. Click **Save configuration**.
-6. Refresh the page — Grafana shows an embedded dashboard; CloudWatch shows an **Open CloudWatch console** link.
+4. For Grafana: enter the **Grafana base URL** (e.g. `https://grafana.example.com`).
+5. For CloudWatch: enter **AWS region** (e.g. `us-east-1`) and, for API access, the **secret references** for your AWS access key id and secret access key (create them under **Company → Secrets** first).
+6. Click **Save configuration** (use **Test AWS access** to verify secret refs resolve).
+7. Refresh — Grafana shows an embedded dashboard; CloudWatch shows an **Open CloudWatch console** link.
 
 | Provider | Config field | What you see after save |
 |----------|--------------|-------------------------|
